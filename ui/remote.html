@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>camlab remote</title>
+<link rel="stylesheet" href="/assets/brand.css">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg-0);color:#c9ccd1;font:16px/1.4 Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+body{display:flex;flex-direction:column;padding:max(12px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
+header b{color:var(--brand-ink);font-family:'Bodoni Moda',Georgia,serif;font-variant:small-caps;letter-spacing:.2em;font-size:16px;text-transform:none;font-weight:500}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--err);display:inline-block}
+.dot.ok{background:var(--ok)}
+#view{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;margin:10px 0}
+#live{max-width:100%;max-height:100%;border:1px solid #23262c;border-radius:4px;object-fit:contain}
+#timer{font:40px ui-monospace,Menlo,monospace;color:var(--brand-ink);text-align:center;margin:4px 0}
+#timer.on{color:var(--err)}
+button{font:inherit;color:#c9ccd1;background:transparent;border:1px solid #23262c;border-radius:4px;height:48px;padding:0 16px}
+#rec{width:100%;height:84px;font-size:22px;letter-spacing:.14em;font-weight:700;background:var(--err);border-color:var(--err);color:#fff}
+#rec.stop{background:transparent;color:var(--err)}
+#rec:disabled{opacity:.35}
+.row{display:flex;gap:10px;margin-top:10px}
+.row button{flex:1}
+.row button.primary{background:var(--brand-gold);border-color:var(--brand-gold);color:#141005;font-weight:600}
+label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin-top:10px}
+input{flex:1;font:inherit;color:#F2EDE4;background:#101215;border:1px solid #23262c;border-radius:4px;height:40px;padding:0 10px}
+#msg{min-height:22px;color:var(--muted);font-size:13px;margin-top:8px;text-align:center}
+#clip{color:var(--brand-ink)}
+#take{display:none;margin-top:10px;border:1px solid #23262c;border-radius:4px;padding:10px 12px}
+#take.on{display:block}
+#take .t{display:flex;align-items:baseline;gap:10px;color:var(--brand-ink)}
+#take .t b{font-size:17px;font-weight:600;word-break:break-all}
+#take .t span,#takes a{color:var(--muted);font-size:13px}
+#take .err{color:var(--err);font-size:13px}
+#take .row{margin-top:8px}
+#take a.btn{flex:1;display:flex;align-items:center;justify-content:center;height:48px;border-radius:4px;text-decoration:none;border:1px solid #23262c;color:#c9ccd1}
+#take a.btn.primary{background:var(--brand-gold);border-color:var(--brand-gold);color:#141005;font-weight:600}
+#takes{max-height:84px;overflow:auto;margin-top:8px;font-size:13px}
+#takes div{display:flex;justify-content:space-between;padding:3px 0;border-top:1px solid #23262c}
+#takes a{color:var(--brand-ink)}
+</style>
+</head>
+<body>
+<header><b>camlab</b><span>remote</span><span style="flex:1"></span><span id="cam"></span><span id="camdot" class="dot"></span></header>
+<div id="view"><img id="live" alt="live view"></div>
+<div id="timer" class="mono">00:00</div>
+<button id="rec" disabled>● RECORD</button>
+<div class="row"><button id="ai" class="primary">AI Auto</button><button id="stop">Stop AI</button><button id="save">Save to…</button></div>
+<div id="take"></div>
+<label>Tag <input id="tag" placeholder="location, e.g. studio" autocapitalize="none"></label>
+<div id="msg"><span id="clip"></span></div>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+let TAKES = [], TAKEERR = '';
+let S = null, ws = null, retry = 0;
+async function post(p, b){ try{ const r = await fetch(p, {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(b || {})}); const j = await r.json().catch(() => ({})); if(!r.ok){ say(j.detail || r.statusText); return null; } return j; }catch(e){ say('No connection'); return null; } }
+function say(t){ $('msg').innerHTML = `<span>${t}</span>`; setTimeout(render, 4000); }
+const pad = n => String(n).padStart(2, '0');
+function render(){
+  if(!S) return;
+  const c = S.camera; $('cam').textContent = c.connected ? (c.model || '').replace(/^Canon /, '') : 'no camera'; $('camdot').classList.toggle('ok', !!c.connected);
+  const rec = $('rec'); rec.disabled = !c.connected; rec.className = S.recording ? 'stop' : ''; rec.textContent = S.recording ? '■ STOP' : '● RECORD';
+  const t = S.recording && S.rec_started ? Math.max(0, Math.floor(Date.now() / 1000 - S.rec_started)) : 0;
+  $('timer').textContent = `${pad(Math.floor(t / 60))}:${pad(t % 60)}`; $('timer').classList.toggle('on', !!S.recording);
+  const cl = S.claude || {}; const running = cl.status === 'running';
+  $('ai').textContent = running ? `AI round ${cl.iteration}/${cl.cap}…` : 'AI Auto'; $('ai').disabled = running || S.recording || !c.connected;
+  $('msg').innerHTML = `<span id="clip">${S.last_clip ? 'last clip: ' + String(S.last_clip).split('/').pop() : ''}</span>`;
+  renderTake();
+  if(document.activeElement !== $('tag')) $('tag').value = S.context.tag || '';
+}
+const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const dur = d => d == null ? '' : `${Math.floor(d / 60)}:${pad(Math.round(d % 60))}`;
+function renderTake(){
+  const list = (S && S.takes && S.takes.length) ? S.takes : TAKES, last = list[list.length - 1], el = $('take');
+  if(S && S.recording){ el.className = ''; return; }
+  if(!last && !TAKEERR){ el.className = ''; return; }
+  const key = JSON.stringify([last && last.label, list.length, TAKEERR]); if(el.dataset.k === key) return; el.dataset.k = key;
+  let h = TAKEERR ? `<div class="err">Could not save the clip: ${esc(TAKEERR)} Trying again...</div>` : '';
+  if(last){
+    const u = '/clips/' + encodeURIComponent(last.label);
+    h += `<div class="t"><b>${esc(last.label)}</b><span>${dur(last.duration_s)}</span></div>
+      <div class="row"><a class="btn primary" href="${u}" target="_blank" rel="noopener">Save to phone</a><a class="btn" href="${u}?play=1" target="_blank" rel="noopener">Play</a></div>`;
+    if(list.length > 1) h += '<div id="takes">' + list.slice(0, -1).reverse().map(t => `<div><span>${esc(t.label)} ${dur(t.duration_s)}</span><a href="/clips/${encodeURIComponent(t.label)}?play=1" target="_blank" rel="noopener">Play</a></div>`).join('') + '</div>';
+  }
+  el.innerHTML = h; el.className = 'on';
+}
+setInterval(render, 500);
+$('rec').onclick = async () => {
+  if(S.recording){ await post('/api/record', {action:'stop'}); }
+  else { const a = await post('/api/arm'); if(a){ const r = await post('/api/record', {action:'start'}); if(!r) post('/api/disarm'); } }
+};
+$('ai').onclick = () => post('/api/claude', {request:'optimize'});
+$('stop').onclick = () => post('/api/claude', {request:'stop'});
+$('save').onclick = async () => { if(!S || !S.last_clip){ say('No clip yet'); return; } const r = await post('/api/clips/export', {clip: String(S.last_clip).split('/').pop()}); if(r) say(r.dialog ? (r.path ? 'Saved on the Mac: ' + r.path : 'Cancelled') : 'On the Mac at ' + r.path); };
+$('tag').onchange = e => post('/api/context', {tag: e.target.value});
+function connect(){
+  ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
+  ws.onopen = () => { retry = 0; };
+  ws.onmessage = e => { const m = JSON.parse(e.data);
+    if(m.type === 'state'){ S = m.state; render(); }
+    else if(!S) return;
+    else if(m.type === 'live' && m.jpeg_b64) $('live').src = 'data:image/jpeg;base64,' + m.jpeg_b64;
+    else if(m.type === 'camera') S.camera = m.camera;
+    else if(m.type === 'record'){ S.recording = m.recording; S.last_clip = m.last_clip; S.rec_started = m.recording ? (S.rec_started || Date.now() / 1000) : null; }
+    else if(m.type === 'take'){ if(m.take){ TAKEERR = ''; S.takes = (S.takes || []).concat([m.take]).slice(-20); S.last_take = m.take; } else TAKEERR = m.error || 'unknown error'; }
+    else if(m.type === 'claude') S.claude = m.claude;
+    else if(m.type === 'context') S.context = m.context;
+    else if(m.type === 'clips' && m.pulled && m.pulled.length) S.last_clip = m.pulled[m.pulled.length - 1].label || m.pulled[m.pulled.length - 1].name;
+    render(); };
+  ws.onclose = () => { setTimeout(connect, Math.min(10000, 500 * 2 ** retry++)); };
+}
+setInterval(() => { if(ws && ws.readyState === 1) ws.send('{"type":"ping"}'); }, 20000);
+fetch('/api/takes').then(r => r.json()).then(j => { TAKES = j.takes || []; render(); }).catch(() => {});
+connect();
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>camlab brand preview</title>
+<link rel="stylesheet" href="brand.css">
+<style>
+body{margin:0;padding:32px;background:#0B0C0E;color:var(--brand-ink);font-family:Inter,system-ui,sans-serif}
+h2{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:36px 0 12px}
+.row{display:flex;align-items:center;gap:40px;flex-wrap:wrap;padding:20px;background:var(--bg-1);border:1px solid var(--line)}
+svg,img{display:block}
+.dcv{color:var(--brand-steel)}
+</style></head><body>
+<h1 class="brand-serif" style="font-weight:500;margin:0">Brand preview</h1>
+<h2>CollTakesChagrin - img at 240 / 360 / 520 px</h2>
+<div class="row" style="color:var(--brand-ink)">
+<img src="ctc-wordmark.svg" width="240" alt=""><img src="ctc-wordmark.svg" width="360" alt=""><img src="ctc-wordmark.svg" width="520" alt="">
+</div>
+<h2>CollTakesChagrin - inline (currentColor)</h2>
+<div class="row" style="color:var(--brand-ink)">
+<svg width="240" viewBox="0 0 520 76"><text x="260" y="50" text-anchor="middle" fill="currentColor" font-weight="500" style="font-family:'Bodoni Moda',Georgia,serif;font-size:46px;letter-spacing:3px"><tspan>Coll</tspan><tspan style="font-style:italic;font-weight:400;letter-spacing:1px" dx="6">Takes</tspan><tspan dx="6">Chagrin</tspan><tspan fill="#C9A86A">.</tspan></text><rect x="190" y="64" width="140" height="1" fill="#C9A86A"/></svg>
+<svg width="480" viewBox="0 0 520 76"><text x="260" y="50" text-anchor="middle" fill="currentColor" font-weight="500" style="font-family:'Bodoni Moda',Georgia,serif;font-size:46px;letter-spacing:3px"><tspan>Coll</tspan><tspan style="font-style:italic;font-weight:400;letter-spacing:1px" dx="6">Takes</tspan><tspan dx="6">Chagrin</tspan><tspan fill="#C9A86A">.</tspan></text><rect x="190" y="64" width="140" height="1" fill="#C9A86A"/></svg>
+</div>
+<h2>DCV - img at 110 / 220 / 330 px</h2>
+<div class="row dcv">
+<img src="dcv-wordmark.svg" width="110" alt=""><img src="dcv-wordmark.svg" width="220" alt=""><img src="dcv-wordmark.svg" width="330" alt="">
+</div>
+<h2>DCV - inline</h2>
+<div class="row dcv">
+<svg width="220" viewBox="0 0 220 76" style="font-family:Inter,Arial,sans-serif"><text x="110" y="44" text-anchor="middle" fill="currentColor" font-size="42" font-weight="700" letter-spacing="10">DCV</text><rect x="60" y="54" width="100" height="1.5" fill="#5FA8C9"/><text x="110" y="70" text-anchor="middle" fill="currentColor" font-size="8.5" font-weight="500" letter-spacing="3.4" opacity=".75">APPLIED TECHNOLOGY</text></svg>
+</div>
+<h2>Lockup - img at 32 / 48 / 72 px tall, and .lockup (40px)</h2>
+<div class="row" style="flex-direction:column;align-items:flex-start;color:var(--brand-ink)">
+<img src="camlab-lockup.svg" height="32" alt=""><img src="camlab-lockup.svg" height="48" alt=""><img src="camlab-lockup.svg" height="72" alt="">
+<img class="lockup" src="camlab-lockup.svg" alt="">
+</div>
+<h2>Lockup - inline</h2>
+<div class="row" style="color:var(--brand-ink)">
+<svg class="lockup" viewBox="0 0 720 48" style="font-size:0"><text x="0" y="30" fill="currentColor" opacity=".85" style="font:20px ui-monospace,Menlo,monospace;letter-spacing:1px">camlab</text><rect x="110" y="8" width="1" height="32" fill="currentColor" opacity=".3"/><text x="132" y="30" fill="currentColor" style="font:700 22px Inter,Arial,sans-serif;letter-spacing:5px">DCV</text><rect x="132" y="35" width="62" height="1.5" fill="#5FA8C9"/><text x="218" y="30" fill="currentColor" opacity=".5" style="font:16px Inter,Arial,sans-serif">×</text><text x="246" y="31" fill="currentColor" style="font:500 28px 'Bodoni Moda',Georgia,serif;letter-spacing:2px"><tspan>Coll</tspan><tspan style="font-style:italic;font-weight:400" dx="4">Takes</tspan><tspan dx="4">Chagrin</tspan><tspan fill="#C9A86A">.</tspan></text></svg>
+</div>
+<p class="brand-mono" style="color:var(--muted);font-size:12px;margin-top:32px">Note: fonts load via Google Fonts; &lt;img&gt;-embedded SVGs use their own @import.</p>
+</body></html>

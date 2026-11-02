@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 76" role="img" aria-label="DCV Applied Technology">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;700&amp;display=swap');
+    .dcv { font-family: Inter, 'Space Grotesk', 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif; }
+  </style>
+  <text class="dcv" x="110" y="44" text-anchor="middle" fill="currentColor" font-size="42" font-weight="700" letter-spacing="10">DCV</text>
+  <rect x="60" y="54" width="100" height="1.5" fill="#5FA8C9"/>
+  <text class="dcv" x="110" y="70" text-anchor="middle" fill="currentColor" font-size="8.5" font-weight="500" letter-spacing="3.4" opacity=".75">APPLIED TECHNOLOGY</text>
+</svg>

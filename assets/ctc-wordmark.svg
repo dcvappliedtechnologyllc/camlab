@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 60" role="img" aria-label="Coll Takes Chagrin" overflow="visible">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@500&amp;display=swap');
+    .ctc { font-family: 'Bodoni Moda', 'Playfair Display', Georgia, 'Times New Roman', serif; font-size: 40px; font-weight: 500; font-variant: small-caps; letter-spacing: .28em; }
+  </style>
+  <text class="ctc" x="0" y="44" fill="currentColor">Coll Takes Chagrin</text>
+</svg>
