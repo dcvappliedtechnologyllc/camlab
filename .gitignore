@@ -1,0 +1,68 @@
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Build output (PyInstaller, the Mac app)
+build/
+dist/
+*.app
+
+# Canon EDSDK: not redistributable, download it from Canon into vendor/
+vendor/
+
+# Runtime data
+logs/
+clips/
+frames/
+stills/
+recipes.json
+context.json
+rounds.json
+export.json
+camlab-handoff/
+sample.jpg
+sheet.jpg
+
+# Godox mesh export: holds the mesh network and app keys
+GodoxLight.db
+GodoxLight.db.state.json
+godox_mesh.json
+godox_mesh.json.state.json
+godox_app/
+
+# Local configuration (real light addresses, LAN hosts, API key)
+config.toml
+claude_desktop_config.json
+
+# Secrets, generally
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+
+# Agent scratch
+.superpowers/
+
+# Archives
+*.zip
+
+# Icon design scratch (the shipped icon is assets/icon/camlab.icns)
+assets/icon/candidate-*.svg
+assets/icon/preview-*.png
+assets/icon/make_candidates.py
+assets/icon/camlab.iconset/

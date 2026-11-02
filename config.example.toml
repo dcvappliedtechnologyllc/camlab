@@ -1,0 +1,85 @@
+# camlab configuration. Copy this file to config.toml and edit it; config.toml is gitignored.
+# Every key here has a default in server/config.py, so a missing config.toml also works
+# (mock camera, DMX key light on no port, manual fill light).
+
+[camera]
+backend = "auto"          # auto | edsdk | gphoto2 | ccapi | mock
+# auto: Canon EDSDK if vendor/EDSDK.framework exists, then gphoto2, then CCAPI if ccapi_host is set, then mock.
+# CCAPI over Wi-Fi: put the body on the LAN (wireless settings -> connect to Wi-Fi network, give it a DHCP
+# reservation), activate CCAPI once with Canon's activation tool, then set the address here. The UI's
+# USB/WiFi button next to the camera pill switches backends at runtime (POST /api/camera/backend).
+# ccapi_host = "192.0.2.50"
+# ccapi_port = 8080
+
+# Godox lights over Bluetooth Mesh
+# ---------------------------------
+# Pair the lights in the Godox Light phone app, then get the app's mesh database out of the phone:
+# iPhone: plug it into the Mac, Finder -> the phone -> Files tab -> drag the Godox Light app's folder to
+# the Mac; the file you need inside it is GodoxLight.db. Copy that file into this folder. (If your app
+# version offers a share/export network option, that JSON file works too: mesh_export = "godox_mesh.json".)
+# The export holds the mesh network key and app key: keep it out of git (it is in .gitignore).
+# List the lights it contains:  .venv/bin/python -m server.lights.godox_mesh export GodoxLight.db
+# mesh_address accepts the app's name for the light ("LE300Bi-1234" or just "LE300Bi"), its MAC, or
+# its unicast address ("0x0202"). The MACs below are placeholders.
+
+[lights.key]
+backend = "godox_mesh"    # dmx | godox_mesh
+model = "Godox LE300Bi"
+mesh_export = "GodoxLight.db"
+mesh_address = "AA:BB:CC:DD:EE:01"
+# (The LE300Bi ignores Bluetooth while a DMX signal is present: unplug DMX to use the mesh.)
+# DMX fallback: backend = "dmx"; channel map assumed 2-ch basic mode, confirm against the manual.
+dmx_start = 1
+channels = { intensity = 1, cct = 2 }
+intensity_min_pct = 0
+intensity_max_pct = 100
+cct_min_k = 2800
+cct_max_k = 6500
+
+[lights.fill]
+backend = "godox_mesh"    # manual | godox_mesh
+model = "Godox LP800Bi"
+mesh_export = "GodoxLight.db"       # same export as the key light: one Bluetooth connection drives both
+mesh_address = "AA:BB:CC:DD:EE:02"
+# ble_address = ""                  # optional: gateway BLE address/UUID; blank = scan for the mesh
+# mesh_src = 1280                   # optional: our provisioner address (0x0500); keep unique per controller
+intensity_min_pct = 0
+intensity_max_pct = 100
+cct_min_k = 2800
+cct_max_k = 6500
+
+[dmx]
+transport = "none"        # serial (Enttec Open DMX / FTDI) | artnet | none
+port = "auto"             # auto = first /dev/cu.usbserial*
+universe = 0
+artnet_host = "192.0.2.60"
+
+[paths]
+frames = "frames"
+clips = "clips"
+recipes = "recipes.json"
+# handoff = "~/Desktop/camlab-handoff"   # where Strings / Ask Claude write sample.jpg, handoff.md
+
+[ai]
+# AI Auto and Ask Claude: the server calls the Claude API itself. Leave api_key blank to hand requests
+# to an MCP-connected Claude session instead ($ANTHROPIC_API_KEY is honoured too).
+api_key = ""
+model = "claude-opus-5-5"   # claude-sonnet-5-5 is about half the cost per run
+cost_cap_usd = 1.0          # per run; a run is usually $0.30-0.60 (8 rounds at most)
+daily_cap_usd = 5.0         # across runs per day (the UI is open to the LAN without a login)
+effort = "medium"           # low | medium | high
+max_run_s = 240             # wall clock per run
+
+[chat]
+# Standing preferences the chat agent must respect (one sentence, shown in every hand-off).
+preferences = "Soft light, warm-neutral colour."
+
+[claude]
+iteration_cap = 8
+arm_window_s = 60
+rate_limit_ms = 500
+
+[server]
+host = "127.0.0.1"        # 0.0.0.0 opens the UI to the LAN (no login); 127.0.0.1 keeps it on this Mac
+port = 8765
+liveview_fps = 3

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "camlab": {
+      "command": "/path/to/camlab/.venv/bin/python",
+      "args": ["-m", "server.main", "--stdio"],
+      "cwd": "/path/to/camlab"
+    }
+  }
+}

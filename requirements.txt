@@ -1,0 +1,19 @@
+# camlab runtime + tests. Python 3.14 (Homebrew python@3.14 on macOS).
+#   python3.14 -m venv .venv && .venv/bin/pip install -r requirements.txt
+fastmcp
+fastapi
+uvicorn[standard]
+websockets
+numpy
+Pillow
+opencv-python-headless
+pyserial
+requests
+httpx
+segno
+anthropic
+bleak
+cryptography
+gphoto2
+pyobjc-framework-Cocoa
+pytest
