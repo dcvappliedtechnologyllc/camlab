@@ -37,7 +37,7 @@ from Homebrew, Xcode command line tools (`codesign`, `ditto`) for the Mac app.
 
 ```bash
 brew install python@3.14 ffmpeg
-git clone https://github.com/dcv-at/camlab.git && cd camlab
+git clone https://github.com/dcvappliedtechnologyllc/camlab.git && cd camlab
 python3.14 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 cp config.example.toml config.toml        # then edit: lights, LAN exposure, API key
