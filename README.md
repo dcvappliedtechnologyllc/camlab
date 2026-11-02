@@ -781,8 +781,11 @@ Applied Technology.
   Their copyright notices apply to that file.
 - **Canon EDSDK is not included.** It is Canon's proprietary SDK, licensed to
   registered developers only. Download it from Canon's developer site and
-  place `EDSDK.framework` in `vendor/` (gitignored). `server/camera/edsdk_tables.py`
-  contains property codes transcribed from Canon's public API reference.
+  place `EDSDK.framework` in `vendor/` (gitignored). The value tables in
+  `server/camera/edsdk_tables.py` (property codes for ISO, aperture, shutter,
+  picture style and so on) are transcribed from Canon's EDSDK API reference
+  and remain Canon's; they are included here, as other open-source EDSDK
+  wrappers do, so the backend can be read and tested without the SDK.
 - The DCV Applied Technology and CollTakesChagrin logos and wordmarks in
   `assets/` (and the app icon built from them) are trademarks of their
   owners and are **not** covered by the MIT licence. Replace them if you
